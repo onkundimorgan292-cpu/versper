@@ -1,84 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deriv App - Official Integration</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deriv Complete - DTrader + DBot</title>
 <style>
-:root{--brand:#ff444f;--bg:#0e0e0e;--card:#1a1a1a;--border:#2e2e2e;--text:#fff;--muted:#999}
+:root{--brand:#ff444f;--bg:#0e0e0e;--card:#1a1a1a;--border:#2e2e2e;--green:#4bb950}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
-body{background:var(--bg);color:var(--text)}
-.header{height:56px;background:#151515;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
-.logo{color:var(--brand);font-weight:900;font-size:22px}
-.btn{padding:8px 16px;border-radius:6px;border:none;font-weight:600;cursor:pointer}
-.btn-primary{background:var(--brand);color:#fff}
-.btn-secondary{background:#2a2a2a;color:#fff;border:1px solid var(--border)}
-.layout{display:grid;grid-template-columns:320px 1fr 320px;height:calc(100vh - 56px)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px}
-.label{font-size:10px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;display:block}
-.input{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:6px;padding:10px;color:#fff;margin-bottom:12px}
-.tick-price{font-size:42px;font-weight:800;text-align:center;padding:20px 0}
-.trade-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
-.trade-btn{padding:14px;border-radius:8px;border:none;font-weight:800;font-size:14px;cursor:pointer}
-.rise{background:#4bb950;color:#fff}.fall{background:#ff444f;color:#fff}
-.disclaimer{background:#1a1a1a;border-top:1px solid var(--border);padding:10px 20px;font-size:11px;color:var(--muted)}
-</style>
-</head>
-<body>
-<div class="header">
-<div class="logo">deriv</div>
-<div style="display:flex;gap:8px">
-<button class="btn btn-primary" id="authBtn" onclick="oauthLogin()">Log in with Deriv OAuth</button>
-<div id="balanceBox" style="display:none;background:#2a2a2a;padding:8px 14px;border-radius:6px;font-weight:700">-</div>
-</div>
-</div>
-<div class="layout">
-<div>
-<div class="card">
-<span class="label">Your App ID from developers.deriv.com</span>
-<input class="input" id="appIdInput" value="1089">
-<button class="btn btn-secondary" style="width:100%" onclick="saveAppId()">Save & Reconnect</button>
-<p style="font-size:11px;color:#888;margin-top:8px">Replace 1089 with your real app_id to be 100% legit</p>
-</div>
-<div class="card">
-<span class="label">Market</span>
-<select id="symbol" class="input" onchange="subscribe()">
-<option value="R_10">Volatility 10</option>
-<option value="R_25">Volatility 25</option>
-<option value="R_100">Volatility 100</option>
-<option value="BOOM1000">Boom 1000</option>
-<option value="CRASH1000">Crash 1000</option>
-<option value="BTCUSD">BTCUSD</option>
-</select>
-<span class="label">Stake USD</span>
-<input id="stake" class="input" type="number" value="1">
-<span class="label">Duration Ticks</span>
-<input id="duration" class="input" type="number" value="5">
-<div class="trade-btns">
-<button class="trade-btn rise" onclick="trade('CALL')">Rise ▲</button>
-<button class="trade-btn fall" onclick="trade('PUT')">Fall ▼</button>
-</div>
-<p style="font-size:11px;color:#888;margin-top:10px">Risk: Use Demo account VRTC first. Real CR account trades real money.</p>
-</div>
-</div>
-<div>
-<div class="tick-price" id="price">--</div>
-<canvas id="chart" width="900" height="320" style="border:1px solid #222;border-radius:8px;background:#0a0a0a;margin:0 12px"></canvas>
-<div class="card"><span class="label">Log</span><div id="log" style="font-family:monospace;font-size:11px;color:#888;height:100px;overflow:auto;background:#0e0e0e;padding:8px"></div></div>
-</div>
-<div>
-<div class="card">
-<span class="label">Portfolio</span>
-<div id="positions" style="font-size:12px;color:#aaa">Login to view</div>
-<button class="btn btn-secondary" style="width:100%;margin-top:10px" onclick="getPortfolio()">Refresh</button>
-</div>
-</div>
-</div>
-<div class="disclaimer">Official Deriv API: wss://ws.derivws.com/websockets/v3 • Host on HTTPS (Vercel) • Register app_id at developers.deriv.com</div>
-<script>
-let APP_ID=localStorage.getItem('deriv_app_id')||'1089';
-let ws,prices=[],token1=null;
-const logEl=document.getElementById('log'),priceEl=document.getElementById('price'),canvas=document.getElementById('chart'),ctx=canvas.getContext('2d');
-function log(m){logEl.innerHTML+=m+"<br>";logEl.scrollTop=logEl.scrollHeight}
-function saveAppId(){let v=document.getElementById('appIdInput').value.trim();localStorage.setItem('deriv_app_id',v);APP_ID=v;connect()}
-function oauthLogin(){window.location.href=`https://oauth.deriv
+body{background:var(--bg);color:#fff}
+.header{height:56px;background:#151515;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;padding:0 16px}
+.logo{color:var(--brand);font-weight:900;font-size:20px}
+.modes{display:flex;gap:6px}
+.mode{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:#222;cursor:pointer;font-size:13px;font-weight:700}
+.mode.active{background:var(--brand);border-color:var(--brand)}
+.layout{display:grid;grid-template-columns:300px 1fr 300px;height:calc(100vh - 56px)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin:10px}
+.label{font-size:10px;color:#999;text-transform:uppercase;margin-bottom:6px;display:block}
+.input,select{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:6px;padding:9px;color:#fff;margin-bottom:10px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.tab{font-size:11px;padding:5px 8px;background:#222;border:1px solid var(--border);border-radius:4px;cursor:pointer}
+.tab.active{background:#333;color:#fff;border-color:var(--brand)}
+.btn{width:100%;padding:10px;border:none;border-radius:6px;font-weight:800;cursor:pointer;margin-top:6px}
+.btn-green{background:var(--green);color:#fff}.btn-red{background:var(--brand);color:#fff}
+.btn-dark{background:#2a2a2a;color:#fff;border:1px solid var(--border)}
+.price{font-size:38px;font-weight:900;text-align:center;padding:16px}
+canvas{width:100%;background:#0a0a0a;border:1px solid var(--border);border-radius:8px}
+.log{font-family:
